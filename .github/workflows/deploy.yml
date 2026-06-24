@@ -47,7 +47,7 @@ jobs:
         run: pnpm --filter @workspace/yt-player run build
         env:
           PORT: "3000"
-          BASE_PATH: "/yt-player"
+          BASE_PATH: "/"
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
