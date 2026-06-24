@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS kv_store (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL,
+  updated_at INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS sessions (
+  token TEXT PRIMARY KEY,
+  username TEXT NOT NULL,
+  created_at INTEGER NOT NULL DEFAULT 0
+);
