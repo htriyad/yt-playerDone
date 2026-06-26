@@ -181,6 +181,10 @@ export default {
     if (pathname === '/gate-admin' || pathname === '/gate-admin/') {
       return serveHtml(env, request, 'gate-admin.html');
     }
+    // Redirect old /admin link → unified /gate-admin
+    if (pathname === '/admin' || pathname === '/admin/') {
+      return Response.redirect(new URL('/gate-admin', request.url).toString(), 301);
+    }
 
     // ── Gate API ──────────────────────────────────────────────────────────────
     if (pathname.startsWith('/gate-api/')) {
