@@ -1,12 +1,7 @@
 function json(data, status = 200, extraHeaders = {}) {
   return new Response(JSON.stringify(data), {
     status,
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Headers': 'Content-Type, X-Admin-Password',
-      ...extraHeaders,
-    },
+    headers: { 'Content-Type': 'application/json', ...extraHeaders },
   });
 }
 
@@ -20,6 +15,14 @@ function getTokenFromCookie(cookieHeader) {
   if (!cookieHeader) return null;
   const match = cookieHeader.match(/gate_token=([a-f0-9]{64})/);
   return match ? match[1] : null;
+}
+
+function isAdminAuthed(request, env) {
+  const u = request.headers.get('X-Admin-Username') || '';
+  const p = request.headers.get('X-Admin-Password') || '';
+  const adminUser = env.ADMIN_USERNAME || 'Hosen Toufiq Riyad';
+  const adminPass = env.ADMIN_PASSWORD || 'Hosen Toufiq Riyad';
+  return u === adminUser && p === adminPass;
 }
 
 async function isValidToken(db, token) {
@@ -39,7 +42,7 @@ async function getGateOpen(db) {
 async function serveHtml(env, request, filename) {
   const url = new URL(request.url);
   url.pathname = '/' + filename;
-  return env.ASSETS.fetch(new Request(url.toString(), { headers: request.headers }));
+  return env.ASSETS.fetch(new Request(url.toString()));
 }
 
 async function serveSite(env, request) {
@@ -47,12 +50,12 @@ async function serveSite(env, request) {
   if (resp.status === 404) {
     const url = new URL(request.url);
     url.pathname = '/';
-    resp = await env.ASSETS.fetch(new Request(url.toString(), { headers: request.headers }));
+    resp = await env.ASSETS.fetch(new Request(url.toString()));
   }
   return resp;
 }
 
-// ── Gate API ──────────────────────────────────────────────────────────────────
+// ── Gate API handlers ─────────────────────────────────────────────────────────
 
 async function handleGetStatus(db) {
   const isOpen = await getGateOpen(db);
@@ -60,8 +63,7 @@ async function handleGetStatus(db) {
 }
 
 async function handleToggleGate(request, db, env) {
-  const adminPw = env.ADMIN_PASSWORD || 'loveurhum2024';
-  if (request.headers.get('X-Admin-Password') !== adminPw) return json({ error: 'Unauthorized' }, 401);
+  if (!isAdminAuthed(request, env)) return json({ error: 'Unauthorized' }, 401);
   const body = await request.json();
   await db.prepare('UPDATE gate_config SET is_open = ? WHERE id = 1').bind(body.isOpen ? 1 : 0).run();
   return json({ isOpen: !!body.isOpen });
@@ -75,19 +77,24 @@ async function handleRequestAccess(request, db) {
   const name = (body.name || '').trim();
   if (!name) return json({ error: 'Name is required.' }, 400);
 
-  const ip =
-    request.headers.get('CF-Connecting-IP') ||
-    request.headers.get('X-Forwarded-For') ||
-    null;
+  // Check if name is in the admin-approved list (case-insensitive)
+  const { results: allowed } = await db
+    .prepare('SELECT id FROM allowed_names WHERE LOWER(name) = LOWER(?)')
+    .bind(name)
+    .all();
+
+  if (allowed.length === 0) {
+    return json({ error: 'This name is not on the access list. Please check with the admin.' }, 403);
+  }
+
+  const ip = request.headers.get('CF-Connecting-IP') || request.headers.get('X-Forwarded-For') || null;
   const userAgent = request.headers.get('User-Agent') || null;
   const fingerprint = body.fingerprint || null;
   const deviceInfo = body.deviceInfo || null;
   const token = generateToken();
 
   await db
-    .prepare(
-      'INSERT INTO gate_members (name, ip, fingerprint, device_info, user_agent, token) VALUES (?, ?, ?, ?, ?, ?)'
-    )
+    .prepare('INSERT INTO gate_members (name, ip, fingerprint, device_info, user_agent, token) VALUES (?, ?, ?, ?, ?, ?)')
     .bind(name, ip, fingerprint, deviceInfo, userAgent, token)
     .run();
 
@@ -103,19 +110,53 @@ async function handleCheckToken(request, db) {
 }
 
 async function handleListMembers(request, db, env) {
-  const adminPw = env.ADMIN_PASSWORD || 'loveurhum2024';
-  if (request.headers.get('X-Admin-Password') !== adminPw) return json({ error: 'Unauthorized' }, 401);
-  const { results } = await db
-    .prepare('SELECT * FROM gate_members ORDER BY granted_at DESC')
-    .all();
+  if (!isAdminAuthed(request, env)) return json({ error: 'Unauthorized' }, 401);
+  const { results } = await db.prepare('SELECT * FROM gate_members ORDER BY granted_at DESC').all();
   return json({ members: results });
 }
 
 async function handleDeleteMember(request, db, env, id) {
-  const adminPw = env.ADMIN_PASSWORD || 'loveurhum2024';
-  if (request.headers.get('X-Admin-Password') !== adminPw) return json({ error: 'Unauthorized' }, 401);
+  if (!isAdminAuthed(request, env)) return json({ error: 'Unauthorized' }, 401);
   await db.prepare('UPDATE gate_members SET is_active = 0 WHERE id = ?').bind(parseInt(id, 10)).run();
   return json({ success: true });
+}
+
+async function handleListAllowedNames(request, db, env) {
+  if (!isAdminAuthed(request, env)) return json({ error: 'Unauthorized' }, 401);
+  const { results } = await db.prepare('SELECT * FROM allowed_names ORDER BY created_at DESC').all();
+  return json({ names: results });
+}
+
+async function handleAddAllowedName(request, db, env) {
+  if (!isAdminAuthed(request, env)) return json({ error: 'Unauthorized' }, 401);
+  const body = await request.json();
+  const name = (body.name || '').trim();
+  if (!name) return json({ error: 'Name is required.' }, 400);
+  try {
+    const { results } = await db
+      .prepare('INSERT INTO allowed_names (name) VALUES (?) RETURNING *')
+      .bind(name)
+      .all();
+    return json({ name: results[0] }, 201);
+  } catch (e) {
+    return json({ error: 'Name already exists.' }, 409);
+  }
+}
+
+async function handleDeleteAllowedName(request, db, env, id) {
+  if (!isAdminAuthed(request, env)) return json({ error: 'Unauthorized' }, 401);
+  await db.prepare('DELETE FROM allowed_names WHERE id = ?').bind(parseInt(id, 10)).run();
+  return json({ success: true });
+}
+
+async function handleAdminLogin(request, env) {
+  const body = await request.json();
+  const adminUser = env.ADMIN_USERNAME || 'Hosen Toufiq Riyad';
+  const adminPass = env.ADMIN_PASSWORD || 'Hosen Toufiq Riyad';
+  if (body.username === adminUser && body.password === adminPass) {
+    return json({ ok: true });
+  }
+  return json({ ok: false, error: 'Invalid credentials.' }, 401);
 }
 
 // ── Main handler ─────────────────────────────────────────────────────────────
@@ -131,7 +172,7 @@ export default {
         headers: {
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, X-Admin-Password',
+          'Access-Control-Allow-Headers': 'Content-Type, X-Admin-Username, X-Admin-Password',
         },
       });
     }
@@ -144,17 +185,29 @@ export default {
     // ── Gate API ──────────────────────────────────────────────────────────────
     if (pathname.startsWith('/gate-api/')) {
       const db = env.DB;
-      if (pathname === '/gate-api/status' && method === 'GET') return handleGetStatus(db);
-      if (pathname === '/gate-api/toggle' && method === 'POST') return handleToggleGate(request, db, env);
+
+      // Public
+      if (pathname === '/gate-api/status' && method === 'GET')  return handleGetStatus(db);
       if (pathname === '/gate-api/access' && method === 'POST') return handleRequestAccess(request, db);
-      if (pathname === '/gate-api/check' && method === 'POST') return handleCheckToken(request, db);
-      if (pathname === '/gate-api/members' && method === 'GET') return handleListMembers(request, db, env);
-      const delMatch = pathname.match(/^\/gate-api\/members\/(\d+)$/);
-      if (delMatch && method === 'DELETE') return handleDeleteMember(request, db, env, delMatch[1]);
+      if (pathname === '/gate-api/check'  && method === 'POST') return handleCheckToken(request, db);
+      if (pathname === '/gate-api/login'  && method === 'POST') return handleAdminLogin(request, env);
+
+      // Admin-protected
+      if (pathname === '/gate-api/toggle'         && method === 'POST')   return handleToggleGate(request, db, env);
+      if (pathname === '/gate-api/members'         && method === 'GET')    return handleListMembers(request, db, env);
+      if (pathname === '/gate-api/allowed-names'   && method === 'GET')    return handleListAllowedNames(request, db, env);
+      if (pathname === '/gate-api/allowed-names'   && method === 'POST')   return handleAddAllowedName(request, db, env);
+
+      const delMember = pathname.match(/^\/gate-api\/members\/(\d+)$/);
+      if (delMember && method === 'DELETE') return handleDeleteMember(request, db, env, delMember[1]);
+
+      const delName = pathname.match(/^\/gate-api\/allowed-names\/(\d+)$/);
+      if (delName && method === 'DELETE') return handleDeleteAllowedName(request, db, env, delName[1]);
+
       return json({ error: 'Not found' }, 404);
     }
 
-    // ── Static assets (JS, CSS, images) — always pass through ────────────────
+    // ── Static assets — always pass through ──────────────────────────────────
     if (
       pathname.startsWith('/assets/') ||
       pathname === '/favicon.svg' ||
@@ -169,7 +222,6 @@ export default {
     const db = env.DB;
     const token = getTokenFromCookie(request.headers.get('Cookie'));
     const valid = await isValidToken(db, token);
-
     if (valid) return serveSite(env, request);
 
     const isOpen = await getGateOpen(db);
