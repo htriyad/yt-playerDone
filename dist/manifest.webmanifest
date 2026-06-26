@@ -1,0 +1,16 @@
+{
+  "name": "RedRose Online Care",
+  "short_name": "RedRose",
+  "description": "RedRose education platform — classes, exams, AI tutor, progress.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#dc2626",
+  "orientation": "any",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any",     "type": "image/svg+xml", "purpose": "any maskable" },
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
