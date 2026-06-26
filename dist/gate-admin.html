@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Admin — loveurhum Gate</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{min-height:100%;background:#0c0c14;font-family:'Segoe UI',system-ui,sans-serif;color:#e0e0f0}
+  /* ── Login ─────────────────────────────── */
+  #login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem}
+  .login-box{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:1.25rem;padding:2.5rem 2rem;width:100%;max-width:380px;backdrop-filter:blur(20px)}
+  .login-box h1{font-size:1.4rem;font-weight:700;color:#fff;margin-bottom:.3rem}
+  .login-box p{color:#5a5a72;font-size:.875rem;margin-bottom:1.75rem}
+  /* ── Dashboard ─────────────────────────── */
+  #app{display:none;max-width:900px;margin:0 auto;padding:2rem 1.25rem 4rem}
+  .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem}
+  .topbar h1{font-size:1.4rem;font-weight:700;color:#fff}
+  .logout-btn{background:transparent;border:1px solid rgba(255,255,255,.12);border-radius:.5rem;padding:.4rem .9rem;color:#888;font-size:.8rem;cursor:pointer}
+  .logout-btn:hover{border-color:rgba(255,255,255,.25);color:#ccc}
+  /* ── Gate toggle card ──────────────────── */
+  .gate-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:1rem;padding:1.5rem;margin-bottom:2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+  .gate-card-info h2{font-size:1.05rem;font-weight:600;color:#fff;margin-bottom:.25rem}
+  .gate-card-info p{font-size:.825rem;color:#5a5a72}
+  .badge{display:inline-flex;align-items:center;gap:.35rem;padding:.25rem .65rem;border-radius:99px;font-size:.75rem;font-weight:600;margin-bottom:.4rem}
+  .badge-open{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.25)}
+  .badge-closed{background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.2)}
+  .toggle-wrap{display:flex;align-items:center;gap:.75rem}
+  .toggle{position:relative;width:52px;height:28px;flex-shrink:0}
+  .toggle input{opacity:0;width:0;height:0}
+  .slider{position:absolute;inset:0;background:#1e1e2e;border:1px solid rgba(255,255,255,.12);border-radius:28px;cursor:pointer;transition:.3s}
+  .slider:before{content:'';position:absolute;width:20px;height:20px;left:3px;top:3px;background:#4a4a62;border-radius:50%;transition:.3s}
+  input:checked + .slider{background:#16a34a;border-color:#16a34a}
+  input:checked + .slider:before{transform:translateX(24px);background:#fff}
+  .toggle-label{font-size:.9rem;font-weight:500;color:#aaa;min-width:36px}
+  /* ── Members ───────────────────────────── */
+  .section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+  .section-hdr h2{font-size:1.05rem;font-weight:600;color:#fff}
+  .refresh-btn{background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:.45rem;padding:.3rem .7rem;color:#888;font-size:.75rem;cursor:pointer}
+  .refresh-btn:hover{border-color:rgba(255,255,255,.2);color:#ccc}
+  .member-list{display:flex;flex-direction:column;gap:.75rem}
+  .member-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:.875rem;padding:1rem 1.25rem;display:grid;grid-template-columns:1fr auto;gap:.75rem;align-items:start}
+  .member-name{font-size:1rem;font-weight:600;color:#fff;margin-bottom:.3rem}
+  .member-meta{display:flex;flex-wrap:wrap;gap:.5rem .75rem}
+  .meta-chip{font-size:.72rem;color:#5a5a72;display:flex;align-items:center;gap:.3rem}
+  .meta-chip b{color:#9090a8;font-weight:500}
+  .del-btn{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.15);border-radius:.5rem;padding:.35rem .7rem;color:#f87171;font-size:.75rem;font-weight:500;cursor:pointer;white-space:nowrap;transition:background .15s}
+  .del-btn:hover{background:rgba(239,68,68,.18)}
+  .del-btn:disabled{opacity:.4;cursor:not-allowed}
+  .revoked-tag{font-size:.7rem;padding:.2rem .5rem;border-radius:99px;background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.18);margin-left:.5rem}
+  .empty{text-align:center;padding:3rem 1rem;color:#3a3a55;font-size:.9rem}
+  /* ── Shared ────────────────────────────── */
+  label{display:block;font-size:.78rem;font-weight:500;color:#6a6a85;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.45rem}
+  input[type=password]{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:.625rem;padding:.8rem 1rem;font-size:.95rem;color:#fff;outline:none;transition:border-color .2s,box-shadow .2s;margin-bottom:.1rem}
+  input[type=password]:focus{border-color:rgba(220,38,38,.5);box-shadow:0 0 0 3px rgba(220,38,38,.1)}
+  .btn-primary{width:100%;background:#dc2626;border:none;border-radius:.625rem;padding:.85rem 1rem;font-size:.95rem;font-weight:600;color:#fff;cursor:pointer;transition:background .15s;margin-top:1rem}
+  .btn-primary:hover{background:#b91c1c}
+  .btn-primary:disabled{opacity:.5;cursor:not-allowed}
+  .err-msg{margin-top:.75rem;font-size:.82rem;color:#f87171;display:none}
+  .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:.3rem}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .count-badge{display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,.08);border-radius:99px;font-size:.72rem;font-weight:600;padding:.1rem .5rem;margin-left:.4rem;color:#9090a8}
+</style>
+</head>
+<body>
+
+<!-- ── Login Screen ───────────────────────────── -->
+<div id="login">
+  <div class="login-box">
+    <h1>🌹 Gate Admin</h1>
+    <p>Enter admin password to continue</p>
+    <label for="pw">Password</label>
+    <input type="password" id="pw" placeholder="••••••••••" autocomplete="current-password"/>
+    <div class="err-msg" id="loginErr">Wrong password.</div>
+    <button class="btn-primary" id="loginBtn" onclick="doLogin()">Sign in</button>
+  </div>
+</div>
+
+<!-- ── Dashboard ──────────────────────────────── -->
+<div id="app">
+  <div class="topbar">
+    <h1>🌹 Gate Admin</h1>
+    <button class="logout-btn" onclick="logout()">Sign out</button>
+  </div>
+
+  <!-- Gate toggle -->
+  <div class="gate-card">
+    <div class="gate-card-info">
+      <div id="gateBadge" class="badge badge-closed">● Closed</div>
+      <h2>Site Access Gate</h2>
+      <p id="gateDesc">Site is private — no one can visit.</p>
+    </div>
+    <div class="toggle-wrap">
+      <span class="toggle-label" id="toggleLabel">OFF</span>
+      <label class="toggle">
+        <input type="checkbox" id="gateToggle" onchange="toggleGate()"/>
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Members -->
+  <div class="section-hdr">
+    <h2>Members <span class="count-badge" id="memberCount">0</span></h2>
+    <button class="refresh-btn" onclick="loadMembers()">↻ Refresh</button>
+  </div>
+  <div class="member-list" id="memberList">
+    <div class="empty">Loading…</div>
+  </div>
+</div>
+
+<script>
+let adminPw = '';
+
+// ── Login ─────────────────────────────────────────────────────────────────────
+document.getElementById('pw').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+async function doLogin() {
+  const pw = document.getElementById('pw').value;
+  const btn = document.getElementById('loginBtn');
+  const err = document.getElementById('loginErr');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Checking…';
+  err.style.display = 'none';
+
+  const resp = await fetch('/gate-api/members', {
+    headers: { 'X-Admin-Password': pw }
+  });
+
+  if (resp.ok) {
+    adminPw = pw;
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    loadGateStatus();
+    loadMembers();
+  } else {
+    err.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Sign in';
+  }
+}
+
+function logout() {
+  adminPw = '';
+  document.getElementById('login').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('pw').value = '';
+}
+
+// ── Gate status ───────────────────────────────────────────────────────────────
+async function loadGateStatus() {
+  const resp = await fetch('/gate-api/status');
+  const { isOpen } = await resp.json();
+  applyGateUI(isOpen);
+}
+
+function applyGateUI(isOpen) {
+  document.getElementById('gateToggle').checked = isOpen;
+  document.getElementById('toggleLabel').textContent = isOpen ? 'ON' : 'OFF';
+  const badge = document.getElementById('gateBadge');
+  badge.textContent = isOpen ? '● Live' : '● Closed';
+  badge.className = 'badge ' + (isOpen ? 'badge-open' : 'badge-closed');
+  document.getElementById('gateDesc').textContent = isOpen
+    ? 'Site is live — visitors can enter their name to get access.'
+    : 'Site is private — no one can visit.';
+}
+
+async function toggleGate() {
+  const isOpen = document.getElementById('gateToggle').checked;
+  document.getElementById('gateToggle').disabled = true;
+  const resp = await fetch('/gate-api/toggle', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Admin-Password': adminPw },
+    body: JSON.stringify({ isOpen }),
+  });
+  const data = await resp.json();
+  applyGateUI(data.isOpen);
+  document.getElementById('gateToggle').disabled = false;
+}
+
+// ── Members ───────────────────────────────────────────────────────────────────
+async function loadMembers() {
+  const list = document.getElementById('memberList');
+  list.innerHTML = '<div class="empty">Loading…</div>';
+  const resp = await fetch('/gate-api/members', {
+    headers: { 'X-Admin-Password': adminPw }
+  });
+  const { members } = await resp.json();
+  document.getElementById('memberCount').textContent = members.filter(m => m.is_active).length;
+  if (!members.length) {
+    list.innerHTML = '<div class="empty">No members yet. When gate is live and someone enters their name, they appear here.</div>';
+    return;
+  }
+  list.innerHTML = '';
+  members.forEach(m => list.appendChild(renderMember(m)));
+}
+
+function renderMember(m) {
+  const card = document.createElement('div');
+  card.className = 'member-card';
+  card.id = 'member-' + m.id;
+
+  const ua = m.user_agent || '';
+  const browser = ua.includes('Chrome') ? 'Chrome' : ua.includes('Firefox') ? 'Firefox' : ua.includes('Safari') ? 'Safari' : ua.includes('Edge') ? 'Edge' : 'Unknown';
+  const os = ua.includes('iPhone') ? 'iOS' : ua.includes('Android') ? 'Android' : ua.includes('Win') ? 'Windows' : ua.includes('Mac') ? 'macOS' : ua.includes('Linux') ? 'Linux' : 'Unknown';
+  const dt = new Date(m.granted_at.includes('Z') ? m.granted_at : m.granted_at + 'Z');
+  const timeStr = dt.toLocaleString();
+  const fp = m.fingerprint ? m.fingerprint.slice(0, 12) + '…' : 'N/A';
+
+  card.innerHTML = `
+    <div>
+      <div class="member-name">${esc(m.name)}${!m.is_active ? '<span class="revoked-tag">Revoked</span>' : ''}</div>
+      <div class="member-meta">
+        <span class="meta-chip">🌐 <b>IP</b> ${esc(m.ip || 'N/A')}</span>
+        <span class="meta-chip">🖥️ <b>OS</b> ${os}</span>
+        <span class="meta-chip">🌍 <b>Browser</b> ${browser}</span>
+        <span class="meta-chip">📱 <b>Device</b> ${esc(m.device_info || 'N/A')}</span>
+        <span class="meta-chip">🔑 <b>Print</b> ${fp}</span>
+        <span class="meta-chip">🕐 <b>Joined</b> ${timeStr}</span>
+      </div>
+    </div>
+    <div>
+      ${m.is_active
+        ? `<button class="del-btn" onclick="revokeMember(${m.id}, this)">Revoke</button>`
+        : ''
+      }
+    </div>
+  `;
+  return card;
+}
+
+async function revokeMember(id, btn) {
+  if (!confirm('Revoke this member\'s access?')) return;
+  btn.disabled = true;
+  btn.textContent = '…';
+  await fetch('/gate-api/members/' + id, {
+    method: 'DELETE',
+    headers: { 'X-Admin-Password': adminPw }
+  });
+  loadMembers();
+}
+
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
+</body>
+</html>
