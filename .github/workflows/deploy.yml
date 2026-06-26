@@ -13,7 +13,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: '20'
 
       - name: Install Worker dependencies
         working-directory: artifacts/cf-worker
@@ -28,6 +28,7 @@ jobs:
   deploy-pages:
     name: Deploy Frontend to Pages
     runs-on: ubuntu-latest
+    needs: deploy-worker
     steps:
       - uses: actions/checkout@v4
 
@@ -37,7 +38,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: '20'
           cache: pnpm
 
       - name: Install dependencies
@@ -46,11 +47,11 @@ jobs:
       - name: Build frontend
         run: pnpm --filter @workspace/yt-player run build
         env:
-          PORT: "3000"
-          BASE_PATH: "/"
+          PORT: '3000'
+          BASE_PATH: '/'
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          command: pages deploy artifacts/yt-player/dist/public --project-name=htriyad --branch=main
+          command: pages deploy artifacts/yt-player/dist/public --project-name=loveurhum --branch=main
