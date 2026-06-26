@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Access — loveurhum</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;background:#0a0a0f;font-family:'Segoe UI',system-ui,sans-serif;color:#e8e8f0;overflow:hidden}
+  .bg{position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(220,38,38,.12) 0%,transparent 70%)}
+  .card{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem}
+  .box{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:1.25rem;padding:2.5rem 2rem;width:100%;max-width:400px;backdrop-filter:blur(20px);box-shadow:0 40px 80px rgba(0,0,0,.5)}
+  .logo{font-size:2.2rem;text-align:center;margin-bottom:.5rem}
+  h1{text-align:center;font-size:1.5rem;font-weight:700;letter-spacing:-.02em;color:#fff;margin-bottom:.4rem}
+  .sub{text-align:center;color:#6b6b80;font-size:.875rem;margin-bottom:2rem;line-height:1.5}
+  label{display:block;font-size:.8rem;font-weight:500;color:#9090a8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem}
+  input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:.625rem;padding:.85rem 1rem;font-size:1rem;color:#fff;outline:none;transition:border-color .2s,box-shadow .2s}
+  input::placeholder{color:#3a3a55}
+  input:focus{border-color:rgba(220,38,38,.6);box-shadow:0 0 0 3px rgba(220,38,38,.12)}
+  .btn{margin-top:1.25rem;width:100%;background:#dc2626;border:none;border-radius:.625rem;padding:.9rem 1rem;font-size:1rem;font-weight:600;color:#fff;cursor:pointer;transition:background .2s,transform .1s,box-shadow .2s}
+  .btn:hover{background:#b91c1c;box-shadow:0 8px 24px rgba(220,38,38,.3)}
+  .btn:active{transform:scale(.98)}
+  .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+  .error{margin-top:1rem;padding:.75rem 1rem;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.2);border-radius:.5rem;color:#f87171;font-size:.875rem;display:none}
+  .spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:.4rem}
+  @keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="card">
+  <div class="box">
+    <div class="logo">🌹</div>
+    <h1>Access Required</h1>
+    <p class="sub">Enter your name to visit this site</p>
+    <label for="name">Your Name</label>
+    <input id="name" type="text" placeholder="e.g. Sarah" autocomplete="off" autofocus/>
+    <div class="error" id="err"></div>
+    <button class="btn" id="btn" onclick="requestAccess()">Continue</button>
+  </div>
+</div>
+<script>
+async function getFingerprint() {
+  const components = [
+    navigator.userAgent,
+    screen.width + 'x' + screen.height + '@' + screen.colorDepth,
+    Intl.DateTimeFormat().resolvedOptions().timeZone,
+    navigator.language,
+    navigator.platform || '',
+    navigator.hardwareConcurrency || '',
+    (navigator.maxTouchPoints || 0) > 0 ? 'touch' : 'notouch',
+  ].join('|');
+  const encoder = new TextEncoder();
+  const data = encoder.encode(components);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+function getDeviceInfo() {
+  const ua = navigator.userAgent;
+  let device = 'Desktop';
+  if (/iPhone/.test(ua)) device = 'iPhone';
+  else if (/iPad/.test(ua)) device = 'iPad';
+  else if (/Android.*Mobile/.test(ua)) device = 'Android Phone';
+  else if (/Android/.test(ua)) device = 'Android Tablet';
+  else if (/Mac/.test(ua)) device = 'Mac';
+  else if (/Windows/.test(ua)) device = 'Windows PC';
+  else if (/Linux/.test(ua)) device = 'Linux';
+  return `${device} | ${screen.width}x${screen.height} | ${navigator.language}`;
+}
+
+document.getElementById('name').addEventListener('keydown', e => {
+  if (e.key === 'Enter') requestAccess();
+});
+
+async function requestAccess() {
+  const nameEl = document.getElementById('name');
+  const btn = document.getElementById('btn');
+  const err = document.getElementById('err');
+  const name = nameEl.value.trim();
+  if (!name) { nameEl.focus(); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Verifying...';
+  err.style.display = 'none';
+
+  try {
+    const [fingerprint, deviceInfo] = await Promise.all([getFingerprint(), getDeviceInfo()]);
+    const resp = await fetch('/gate-api/access', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, fingerprint, deviceInfo }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) {
+      err.textContent = data.error || 'Access denied.';
+      err.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Continue';
+      return;
+    }
+    // Token set via cookie by server — redirect to site
+    document.cookie = `gate_token=${data.token}; path=/; max-age=31536000; samesite=lax`;
+    window.location.href = '/';
+  } catch (e) {
+    err.textContent = 'Network error. Please try again.';
+    err.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Continue';
+  }
+}
+</script>
+</body>
+</html>
