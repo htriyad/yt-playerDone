@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="bn-BD">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <title>Red Rose 🥀</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#0a0f1e" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Red Rose 🥀" />
+    <meta name="description" content="Red Rose 🥀 — Premium Exam Portal for SSC, HSC, Admission & BCS" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://www.youtube.com">
+    <link rel="preconnect" href="https://www.youtube-nocookie.com">
+    <link rel="preconnect" href="https://i.ytimg.com">
+    <link rel="preconnect" href="https://s.ytimg.com">
+    <link rel="dns-prefetch" href="https://www.googlevideo.com">
+    <link rel="preload" as="script" href="https://www.youtube.com/iframe_api">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Lato:ital,wght@0,300;0,400;0,700;1,300&family=Roboto:wght@300;400;500;700&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" />
+    <script type="module" crossorigin src="/assets/index-CnOU4m_S.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-05mIG8x-.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
