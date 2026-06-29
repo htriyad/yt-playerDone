@@ -139,6 +139,19 @@ input:checked+.slider:before{transform:translateX(24px);background:#fff}
 .ch-del{background:none;border:none;color:#f87171;cursor:pointer;font-size:.78rem;line-height:1;padding:0 0 0 .15rem;opacity:.7}
 .ch-del:hover{opacity:1}
 
+/* Subject password */
+.pw-row{display:flex;align-items:center;gap:.6rem;margin-top:.65rem;padding-top:.65rem;
+  border-top:1px solid rgba(255,255,255,.055);flex-wrap:wrap}
+.pw-badge{display:inline-flex;align-items:center;gap:.3rem;font-size:.73rem;padding:.2rem .55rem;
+  border-radius:99px;font-weight:600}
+.pw-badge.locked{background:rgba(251,191,36,.1);color:#fbbf24;border:1px solid rgba(251,191,36,.2)}
+.pw-badge.unlocked{background:rgba(255,255,255,.06);color:#606080;border:1px solid rgba(255,255,255,.08)}
+.pw-form{display:none;margin-top:.6rem;padding:.75rem .9rem;background:rgba(0,0,0,.2);
+  border-radius:.6rem;border:1px solid rgba(255,255,255,.07)}
+.pw-form.open{display:block}
+.pw-inp-row{display:flex;gap:.5rem;margin-top:.5rem}
+.pw-inp-row input{flex:1;padding:.55rem .75rem;font-size:.85rem}
+
 /* Members */
 .mem-list{display:flex;flex-direction:column;gap:.65rem}
 .mem-card{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.062);
@@ -654,6 +667,8 @@ function renderSubjects() {
   list.innerHTML='';
   allSubjects.forEach(s=>{
     const ch=s.chapters||[];
+    const hasPass=!!(s.password);
+    const sid=s.id.replace(/[^a-zA-Z0-9]/g,'_');
     const el=document.createElement('div'); el.className='subj-card';
     el.innerHTML=`<div class="subj-head">
       <div class="subj-name">
@@ -665,7 +680,30 @@ function renderSubjects() {
         <button class="btn btn-danger btn-xs" onclick="deleteSubject('${esc(s.id)}','${esc(s.name.replace(/'/g,"\\'"))}')">Delete</button>
       </div>
     </div>
-    ${ch.length?`<div class="ch-row">${ch.map(c=>`<span class="ch-chip">${esc(c.name)}<button class="ch-del" onclick="deleteChapter('${esc(s.id)}','${esc(c.id)}','${esc(c.name.replace(/'/g,"\\'"))}')">×</button></span>`).join('')}</div>`:'<div style="font-size:.75rem;color:#404060;margin-top:.25rem">No chapters yet.</div>'}`;
+    ${ch.length?`<div class="ch-row">${ch.map(c=>`<span class="ch-chip">${esc(c.name)}<button class="ch-del" onclick="deleteChapter('${esc(s.id)}','${esc(c.id)}','${esc(c.name.replace(/'/g,"\\'"))}')">×</button></span>`).join('')}</div>`:'<div style="font-size:.75rem;color:#404060;margin-top:.25rem">No chapters yet.</div>'}
+
+    <div class="pw-row">
+      <span class="pw-badge ${hasPass?'locked':'unlocked'}" id="pwbadge-${sid}">
+        ${hasPass?'🔒 Password locked':'🔓 No password'}
+      </span>
+      ${hasPass
+        ?`<button class="btn btn-ghost btn-xs" onclick="togglePwForm('${sid}')">Change</button>
+           <button class="btn btn-danger btn-xs" onclick="removeSubjectPassword('${esc(s.id)}','${sid}')">Remove</button>`
+        :`<button class="btn btn-ghost btn-xs" onclick="togglePwForm('${sid}')">Set Password</button>`
+      }
+    </div>
+    <div class="pw-form" id="pwform-${sid}">
+      <div style="font-size:.78rem;color:#808098;margin-bottom:.3rem">
+        ${hasPass?'Enter a new password to replace the current one:':'Visitors must enter this password to open this playlist:'}
+      </div>
+      <div class="pw-inp-row">
+        <input type="text" id="pwinp-${sid}" placeholder="Enter password…"
+          onkeydown="if(event.key==='Enter')saveSubjectPassword('${esc(s.id)}','${sid}')"/>
+        <button class="btn btn-primary btn-sm" onclick="saveSubjectPassword('${esc(s.id)}','${sid}')">Save</button>
+      </div>
+      <div class="msg msg-ok" id="pwok-${sid}" style="margin-top:.45rem"></div>
+      <div class="msg msg-err" id="pwerr-${sid}" style="margin-top:.45rem"></div>
+    </div>`;
     list.appendChild(el);
   });
 }
@@ -705,6 +743,43 @@ async function deleteChapter(subjId,chapId,name) {
   if(!confirm(`Delete chapter "${name}"?`))return;
   await fetch(CA+'/api/admin/subjects/'+subjId+'/chapters/'+chapId,{method:'DELETE',headers:cHdr()});
   loadSubjects();
+}
+
+// ── Subject password ──────────────────────────────────────────
+function togglePwForm(sid) {
+  const form=document.getElementById('pwform-'+sid);
+  const isOpen=form.classList.contains('open');
+  form.classList.toggle('open',!isOpen);
+  if(!isOpen) document.getElementById('pwinp-'+sid)?.focus();
+}
+async function saveSubjectPassword(subjId, sid) {
+  const inp=document.getElementById('pwinp-'+sid);
+  const pw=inp.value.trim();
+  const okEl=document.getElementById('pwok-'+sid);
+  const errEl=document.getElementById('pwerr-'+sid);
+  okEl.style.display='none'; errEl.style.display='none';
+  if(!pw){showMsg(errEl,'err','Please enter a password.');inp.focus();return;}
+  const resp=await fetch(CA+'/api/admin/subjects/'+subjId,{
+    method:'PUT',headers:cHdr(),body:JSON.stringify({password:pw})
+  }).then(r=>r.json()).catch(e=>({error:e.message}));
+  if(resp.error){showMsg(errEl,'err',resp.error);return;}
+  showMsg(okEl,'ok','🔒 Password saved.');
+  inp.value='';
+  // update local data + re-render
+  const s=allSubjects.find(x=>x.id===subjId);
+  if(s) s.password=pw;
+  setTimeout(()=>{ document.getElementById('pwform-'+sid)?.classList.remove('open'); renderSubjects(); },900);
+}
+async function removeSubjectPassword(subjId, sid) {
+  if(!confirm('Remove the password? Anyone will be able to open this playlist freely.'))return;
+  const errEl=document.getElementById('pwerr-'+sid);
+  const resp=await fetch(CA+'/api/admin/subjects/'+subjId,{
+    method:'PUT',headers:cHdr(),body:JSON.stringify({password:null})
+  }).then(r=>r.json()).catch(e=>({error:e.message}));
+  if(resp.error){showMsg(errEl,'err',resp.error);return;}
+  const s=allSubjects.find(x=>x.id===subjId);
+  if(s) s.password=null;
+  renderSubjects();
 }
 
 // ── Members ───────────────────────────────────────────────────
