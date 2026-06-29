@@ -684,17 +684,20 @@ function renderSubjects() {
 
     <div class="pw-row">
       <span class="pw-badge ${hasPass?'locked':'unlocked'}" id="pwbadge-${sid}">
-        ${hasPass?'🔒 Password locked':'🔓 No password'}
+        ${hasPass?'🔒 Locked':'🔓 No password'}
       </span>
       ${hasPass
-        ?`<button class="btn btn-ghost btn-xs" onclick="togglePwForm('${sid}')">Change</button>
+        ?`<span style="font-size:.8rem;color:#c8c880;font-family:monospace;background:rgba(255,255,150,.07);
+            border:1px solid rgba(255,255,100,.12);border-radius:.4rem;padding:.15rem .5rem;
+            letter-spacing:.02em">${esc(s.password)}</span>
+           <button class="btn btn-ghost btn-xs" onclick="togglePwForm('${sid}')">Change</button>
            <button class="btn btn-danger btn-xs" onclick="removeSubjectPassword('${esc(s.id)}','${sid}')">Remove</button>`
         :`<button class="btn btn-ghost btn-xs" onclick="togglePwForm('${sid}')">Set Password</button>`
       }
     </div>
     <div class="pw-form" id="pwform-${sid}">
       <div style="font-size:.78rem;color:#808098;margin-bottom:.3rem">
-        ${hasPass?'Enter a new password to replace the current one:':'Visitors must enter this password to open this playlist:'}
+        ${hasPass?`New password (current: <b style="color:#c8c880">${esc(s.password)}</b>):`:'Visitors must enter this password to open this playlist:'}
       </div>
       <div class="pw-inp-row">
         <input type="text" id="pwinp-${sid}" placeholder="Enter password…"
