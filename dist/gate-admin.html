@@ -3,321 +3,747 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Admin — loveurhum Gate</title>
+<title>Admin — loveurhum</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{min-height:100%;background:#0c0c14;font-family:'Segoe UI',system-ui,sans-serif;color:#e0e0f0}
+html,body{min-height:100%;background:#0c0c14;font-family:'Segoe UI',system-ui,sans-serif;color:#dde0f0;font-size:15px}
 
 /* Login */
-#login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(220,38,38,.1) 0%,transparent 70%)}
-.login-box{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:1.25rem;padding:2.75rem 2.25rem;width:100%;max-width:400px;backdrop-filter:blur(20px)}
-.login-logo{font-size:2.4rem;text-align:center;margin-bottom:.5rem}
-.login-box h1{font-size:1.35rem;font-weight:700;color:#fff;text-align:center;margin-bottom:.3rem}
-.login-box p{color:#5a5a72;font-size:.85rem;text-align:center;margin-bottom:2rem}
+#loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;
+  background:radial-gradient(ellipse 80% 55% at 50% 0%,rgba(220,38,38,.13) 0%,transparent 65%)}
+.login-box{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:1.25rem;
+  padding:2.75rem 2.25rem;width:100%;max-width:380px;backdrop-filter:blur(20px)}
+.login-logo{font-size:2.6rem;text-align:center;margin-bottom:.4rem}
+.login-box h1{font-size:1.35rem;font-weight:700;color:#fff;text-align:center;margin-bottom:.25rem}
+.login-sub{color:#4a4a65;font-size:.82rem;text-align:center;margin-bottom:2rem}
 
-/* Dashboard */
-#app{display:none;max-width:960px;margin:0 auto;padding:2rem 1.25rem 5rem}
-.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem}
-.topbar h1{font-size:1.35rem;font-weight:700;color:#fff;display:flex;align-items:center;gap:.5rem}
-.logout-btn{background:transparent;border:1px solid rgba(255,255,255,.12);border-radius:.5rem;padding:.4rem .9rem;color:#888;font-size:.8rem;cursor:pointer;transition:border-color .15s,color .15s}
-.logout-btn:hover{border-color:rgba(255,255,255,.28);color:#ccc}
+/* Shell */
+#app{display:none;min-height:100vh}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:215px;background:rgba(255,255,255,.025);
+  border-right:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;padding:1.2rem 0;z-index:50}
+.sb-logo{display:flex;align-items:center;gap:.6rem;padding:.5rem 1.2rem 1.4rem;
+  font-size:1.05rem;font-weight:700;color:#fff;border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:.6rem}
+.sb-logo span{font-size:1.5rem}
+.nav-item{display:flex;align-items:center;gap:.72rem;padding:.68rem 1.2rem;font-size:.875rem;
+  font-weight:500;color:#606080;cursor:pointer;transition:all .15s;border-left:3px solid transparent;
+  text-decoration:none;user-select:none}
+.nav-item:hover{color:#aaa;background:rgba(255,255,255,.04)}
+.nav-item.active{color:#fff;background:rgba(220,38,38,.1);border-left-color:#dc2626}
+.nav-icon{font-size:.95rem;width:18px;text-align:center}
+.sb-bottom{margin-top:auto;padding:.9rem 1.2rem;border-top:1px solid rgba(255,255,255,.06)}
+.sb-user{font-size:.76rem;color:#404060;margin-bottom:.55rem;line-height:1.5}
+.sb-user b{color:#6060a0}
+.main{margin-left:215px;padding:2rem 2.25rem 4rem}
+
+/* Page header */
+.page-hdr{margin-bottom:1.6rem}
+.page-hdr h1{font-size:1.25rem;font-weight:700;color:#fff;display:flex;align-items:center;gap:.5rem}
+.page-hdr p{font-size:.82rem;color:#444468;margin-top:.25rem}
 
 /* Cards */
-.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:1rem;padding:1.5rem;margin-bottom:1.5rem}
+.card{background:rgba(255,255,255,.034);border:1px solid rgba(255,255,255,.07);border-radius:1rem;
+  padding:1.35rem 1.5rem;margin-bottom:1.2rem}
+.card-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.3rem;flex-wrap:wrap;gap:.5rem}
+.card-title{font-size:.95rem;font-weight:600;color:#fff;display:flex;align-items:center;gap:.4rem}
+.card-desc{font-size:.8rem;color:#404060;margin-bottom:1rem;line-height:1.5}
 
-/* Gate toggle */
+/* Forms */
+label.lbl{display:block;font-size:.72rem;font-weight:600;color:#505075;
+  text-transform:uppercase;letter-spacing:.07em;margin:.85rem 0 .38rem}
+label.lbl:first-child{margin-top:0}
+input[type=text],input[type=password],input[type=url],select,textarea{
+  width:100%;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.1);
+  border-radius:.6rem;padding:.7rem .95rem;font-size:.9rem;color:#e0e0f0;outline:none;
+  transition:border-color .2s,box-shadow .2s;font-family:inherit}
+input::placeholder,textarea::placeholder{color:#282840}
+input:focus,select:focus,textarea:focus{border-color:rgba(220,38,38,.55);box-shadow:0 0 0 3px rgba(220,38,38,.1)}
+select option{background:#12121e;color:#dde0f0}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.35rem;
+  padding:.6rem 1.05rem;border-radius:.55rem;font-size:.85rem;font-weight:600;
+  cursor:pointer;border:none;transition:all .15s;white-space:nowrap;text-decoration:none;font-family:inherit}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-primary{background:#dc2626;color:#fff}
+.btn-primary:hover:not(:disabled){background:#b91c1c}
+.btn-ghost{background:rgba(255,255,255,.07);color:#aaa;border:1px solid rgba(255,255,255,.1)}
+.btn-ghost:hover:not(:disabled){background:rgba(255,255,255,.12);color:#ddd}
+.btn-danger{background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.16)}
+.btn-danger:hover:not(:disabled){background:rgba(239,68,68,.2)}
+.btn-sm{padding:.35rem .7rem;font-size:.78rem}
+.btn-xs{padding:.22rem .5rem;font-size:.72rem}
+.btn-full{width:100%;margin-top:1rem}
+.btn-row{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.9rem;align-items:center}
+
+/* Messages */
+.msg{margin-top:.6rem;padding:.55rem .9rem;border-radius:.5rem;font-size:.82rem;display:none;line-height:1.4}
+.msg-err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.18);color:#f87171}
+.msg-ok{background:rgba(34,197,94,.09);border:1px solid rgba(34,197,94,.18);color:#4ade80}
+
+/* Gate */
 .gate-row{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
-.gate-info h2{font-size:1rem;font-weight:600;color:#fff;margin-bottom:.25rem}
-.gate-info p{font-size:.825rem;color:#5a5a72}
-.badge{display:inline-flex;align-items:center;gap:.35rem;padding:.22rem .6rem;border-radius:99px;font-size:.73rem;font-weight:600;margin-bottom:.4rem}
-.badge-open{background:rgba(34,197,94,.14);color:#4ade80;border:1px solid rgba(34,197,94,.22)}
-.badge-closed{background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.2)}
-.toggle-wrap{display:flex;align-items:center;gap:.75rem}
-.toggle{position:relative;width:52px;height:28px;flex-shrink:0}
-.toggle input{opacity:0;width:0;height:0}
-.slider{position:absolute;inset:0;background:#1e1e2e;border:1px solid rgba(255,255,255,.12);border-radius:28px;cursor:pointer;transition:.25s}
-.slider:before{content:'';position:absolute;width:20px;height:20px;left:3px;top:3px;background:#4a4a62;border-radius:50%;transition:.25s}
-input:checked + .slider{background:#16a34a;border-color:#16a34a}
-input:checked + .slider:before{transform:translateX(24px);background:#fff}
-.toggle-label{font-size:.9rem;font-weight:600;color:#aaa;min-width:32px}
+.badge{display:inline-flex;align-items:center;gap:.3rem;padding:.2rem .62rem;border-radius:99px;
+  font-size:.71rem;font-weight:600;margin-bottom:.3rem}
+.badge-on{background:rgba(34,197,94,.12);color:#4ade80;border:1px solid rgba(34,197,94,.2)}
+.badge-off{background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.18)}
+.toggle{position:relative;width:50px;height:26px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0;position:absolute}
+.slider{position:absolute;inset:0;background:#1a1a2a;border:1px solid rgba(255,255,255,.1);
+  border-radius:26px;cursor:pointer;transition:.25s}
+.slider:before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;
+  background:#3a3a55;border-radius:50%;transition:.25s}
+input:checked+.slider{background:#16a34a;border-color:#16a34a}
+input:checked+.slider:before{transform:translateX(24px);background:#fff}
+.toggle-row{display:flex;align-items:center;gap:.65rem}
+.toggle-lbl{font-size:.88rem;font-weight:600;color:#606082;min-width:26px}
 
-/* Section header */
-.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
-.sec-hdr h2{font-size:1rem;font-weight:600;color:#fff;display:flex;align-items:center;gap:.5rem}
-.count{display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,.08);border-radius:99px;font-size:.7rem;font-weight:600;padding:.1rem .5rem;color:#9090a8}
+/* Name chips */
+.chips{display:flex;flex-direction:column;gap:.42rem;margin-top:.75rem}
+.chip{display:flex;align-items:center;justify-content:space-between;
+  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:.6rem;padding:.52rem .88rem}
+.chip-name{font-size:.875rem;color:#c0c0e0;display:flex;align-items:center;gap:.45rem}
+.chip-name::before{content:'✦';font-size:.58rem;color:#dc2626;opacity:.6}
 
-/* Add name form */
-.add-row{display:flex;gap:.6rem;margin-bottom:1rem}
-.add-row input{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:.6rem;padding:.65rem .9rem;font-size:.9rem;color:#fff;outline:none;transition:border-color .2s}
-.add-row input::placeholder{color:#3a3a55}
-.add-row input:focus{border-color:rgba(220,38,38,.5);box-shadow:0 0 0 3px rgba(220,38,38,.1)}
-.add-btn{background:#dc2626;border:none;border-radius:.6rem;padding:.65rem 1.1rem;font-size:.875rem;font-weight:600;color:#fff;cursor:pointer;white-space:nowrap;transition:background .15s}
-.add-btn:hover{background:#b91c1c}
-.add-btn:disabled{opacity:.5;cursor:not-allowed}
+/* Video list */
+.vid-list{display:flex;flex-direction:column;gap:.45rem;max-height:400px;overflow-y:auto;padding-right:.2rem}
+.vid-item{display:flex;align-items:center;gap:.7rem;background:rgba(255,255,255,.028);
+  border:1px solid rgba(255,255,255,.065);border-radius:.6rem;padding:.55rem .85rem;cursor:pointer;transition:border-color .15s}
+.vid-item:hover{border-color:rgba(220,38,38,.3)}
+.vid-item.selected{border-color:rgba(220,38,38,.5);background:rgba(220,38,38,.07)}
+.vid-check{width:16px;height:16px;accent-color:#dc2626;flex-shrink:0;cursor:pointer}
+.vid-thumb{width:70px;height:39px;object-fit:cover;border-radius:.32rem;background:#111;flex-shrink:0}
+.vid-title{font-size:.82rem;color:#c0c0e0;line-height:1.4}
+.vid-meta{font-size:.7rem;color:#404060;margin-top:.18rem}
 
-/* Allowed names list */
-.name-list{display:flex;flex-direction:column;gap:.5rem}
-.name-chip{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:.625rem;padding:.6rem 1rem}
-.name-text{font-size:.9rem;font-weight:500;color:#d0d0e8;display:flex;align-items:center;gap:.5rem}
-.name-text::before{content:'✦';font-size:.65rem;color:#dc2626;opacity:.7}
-.del-name-btn{background:transparent;border:1px solid rgba(239,68,68,.2);border-radius:.4rem;padding:.25rem .55rem;color:#f87171;font-size:.72rem;cursor:pointer;transition:background .15s}
-.del-name-btn:hover{background:rgba(239,68,68,.15)}
+/* Videos management */
+.videos-grid{display:flex;flex-direction:column;gap:.45rem}
+.vmgr-item{display:grid;grid-template-columns:auto 70px 1fr auto;align-items:center;gap:.75rem;
+  background:rgba(255,255,255,.028);border:1px solid rgba(255,255,255,.065);border-radius:.65rem;
+  padding:.55rem .9rem}
+.vmgr-num{font-size:.72rem;color:#404060;width:28px;text-align:right}
+.vmgr-thumb{width:70px;height:39px;object-fit:cover;border-radius:.3rem;background:#111;flex-shrink:0}
+.vmgr-title{font-size:.83rem;color:#c8c8e8;line-height:1.35}
+.vmgr-sub{font-size:.7rem;color:#404060;margin-top:.15rem}
 
-/* Member cards */
-.member-list{display:flex;flex-direction:column;gap:.75rem}
-.member-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:.875rem;padding:1rem 1.25rem;display:grid;grid-template-columns:1fr auto;gap:.75rem;align-items:start}
-.member-name{font-size:.95rem;font-weight:600;color:#fff;margin-bottom:.35rem}
-.member-meta{display:flex;flex-wrap:wrap;gap:.4rem .7rem}
-.meta-chip{font-size:.71rem;color:#5a5a72;display:flex;align-items:center;gap:.25rem}
-.meta-chip b{color:#8888a8;font-weight:500}
-.del-btn{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.15);border-radius:.5rem;padding:.35rem .7rem;color:#f87171;font-size:.75rem;font-weight:500;cursor:pointer;white-space:nowrap;transition:background .15s}
-.del-btn:hover{background:rgba(239,68,68,.18)}
-.revoked{font-size:.68rem;padding:.18rem .45rem;border-radius:99px;background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.18);margin-left:.4rem}
+/* Subjects */
+.subj-list{display:flex;flex-direction:column;gap:.65rem}
+.subj-card{background:rgba(255,255,255,.028);border:1px solid rgba(255,255,255,.065);
+  border-radius:.75rem;padding:.9rem 1.1rem}
+.subj-head{display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;margin-bottom:.5rem}
+.subj-name{font-size:.92rem;font-weight:600;color:#e0e0f0;display:flex;align-items:center;gap:.5rem}
+.subj-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.subj-course{font-size:.75rem;color:#505070;font-weight:400}
+.ch-row{display:flex;flex-wrap:wrap;gap:.35rem}
+.ch-chip{display:inline-flex;align-items:center;gap:.35rem;padding:.18rem .5rem;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);border-radius:99px;font-size:.72rem;color:#8080a8}
+.ch-del{background:none;border:none;color:#f87171;cursor:pointer;font-size:.78rem;line-height:1;padding:0 0 0 .15rem;opacity:.7}
+.ch-del:hover{opacity:1}
 
-.refresh-btn{background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:.45rem;padding:.3rem .7rem;color:#888;font-size:.75rem;cursor:pointer;transition:border-color .15s,color .15s}
-.refresh-btn:hover{border-color:rgba(255,255,255,.22);color:#ccc}
-.empty{text-align:center;padding:2.5rem 1rem;color:#3a3a55;font-size:.875rem}
+/* Members */
+.mem-list{display:flex;flex-direction:column;gap:.65rem}
+.mem-card{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.062);
+  border-radius:.85rem;padding:.9rem 1.15rem;display:grid;grid-template-columns:1fr auto;gap:.75rem;align-items:start}
+.mem-name{font-size:.93rem;font-weight:600;color:#fff;margin-bottom:.32rem}
+.meta-row{display:flex;flex-wrap:wrap;gap:.25rem .6rem}
+.meta{font-size:.7rem;color:#404060}
+.meta b{color:#707090}
+.rev-badge{font-size:.66rem;padding:.13rem .4rem;border-radius:99px;
+  background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.15);margin-left:.4rem}
 
-/* Shared inputs */
-label{display:block;font-size:.77rem;font-weight:500;color:#6a6a85;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.45rem;margin-top:1.1rem}
-label:first-of-type{margin-top:0}
-input[type=text],input[type=password]{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:.625rem;padding:.8rem 1rem;font-size:.95rem;color:#fff;outline:none;transition:border-color .2s,box-shadow .2s}
-input[type=text]:focus,input[type=password]:focus{border-color:rgba(220,38,38,.5);box-shadow:0 0 0 3px rgba(220,38,38,.1)}
-.btn-primary{width:100%;background:#dc2626;border:none;border-radius:.625rem;padding:.85rem 1rem;font-size:.95rem;font-weight:600;color:#fff;cursor:pointer;transition:background .15s;margin-top:1.25rem}
-.btn-primary:hover{background:#b91c1c}
-.btn-primary:disabled{opacity:.5;cursor:not-allowed}
-.err-msg{margin-top:.75rem;font-size:.82rem;color:#f87171;display:none;text-align:center}
-.spinner{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:.3rem}
-@keyframes spin{to{transform:rotate(360deg)}}
+/* Filters / search */
+.filter-bar{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center}
+.filter-bar input,.filter-bar select{width:auto;flex:1;min-width:140px;padding:.55rem .85rem;font-size:.83rem}
+.filter-bar select{min-width:120px;max-width:180px}
+
+/* Counts */
+.count{display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,.08);
+  border-radius:99px;font-size:.67rem;font-weight:600;padding:.08rem .45rem;color:#606088;margin-left:.3rem}
+
+/* Spinner */
+.spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.2);
+  border-top-color:#fff;border-radius:50%;animation:_sp .65s linear infinite;vertical-align:middle}
+@keyframes _sp{to{transform:rotate(360deg)}}
+
+/* API status pill */
+.api-pill{display:inline-flex;align-items:center;gap:.3rem;font-size:.74rem;color:#505075;padding:.18rem .55rem;
+  border:1px solid rgba(255,255,255,.07);border-radius:99px;margin-left:.5rem}
+.api-dot{width:6px;height:6px;border-radius:50%;background:#606070}
+.api-dot.ok{background:#4ade80}
+.api-dot.fail{background:#f87171}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#2a2a3a;border-radius:99px}
+
+/* Mobile */
+@media(max-width:720px){
+  .sidebar{display:none}
+  .main{margin-left:0;padding:1rem 1rem 4rem}
+  .mob-nav{display:flex!important}
+  .vmgr-item{grid-template-columns:70px 1fr auto}
+  .vmgr-num{display:none}
+}
+.mob-nav{display:none;gap:.3rem;overflow-x:auto;margin-bottom:1.25rem;padding-bottom:.2rem}
+.mob-nav .nav-item{border-left:none;border-bottom:2px solid transparent;padding:.45rem .8rem;
+  border-radius:.5rem;font-size:.78rem;white-space:nowrap}
+.mob-nav .nav-item.active{border-bottom-color:#dc2626;border-left-color:transparent}
 </style>
 </head>
 <body>
 
-<!-- Login -->
-<div id="login">
+<!-- ════ LOGIN ════════════════════════════════════════════════ -->
+<div id="loginScreen">
   <div class="login-box">
     <div class="login-logo">🌹</div>
-    <h1>Gate Admin</h1>
-    <p>Sign in to manage site access</p>
-    <label for="uname">Username</label>
-    <input type="text" id="uname" placeholder="Your admin username" autocomplete="username"/>
-    <label for="pw">Password</label>
+    <h1>Admin Panel</h1>
+    <p class="login-sub">loveurhum — site management</p>
+    <label class="lbl" for="uname">Username</label>
+    <input type="text" id="uname" placeholder="Admin username" autocomplete="username"/>
+    <label class="lbl" for="pw">Password</label>
     <input type="password" id="pw" placeholder="••••••••••" autocomplete="current-password"/>
-    <div class="err-msg" id="loginErr">Invalid username or password.</div>
-    <button class="btn-primary" id="loginBtn" onclick="doLogin()">Sign in</button>
+    <div class="msg msg-err" id="loginErr"></div>
+    <button class="btn btn-primary btn-full" id="loginBtn" onclick="doLogin()">Sign in</button>
   </div>
 </div>
 
-<!-- Dashboard -->
+<!-- ════ APP ══════════════════════════════════════════════════ -->
 <div id="app">
-  <div class="topbar">
-    <h1>🌹 Gate Admin</h1>
-    <button class="logout-btn" onclick="logout()">Sign out</button>
-  </div>
 
-  <!-- Gate toggle -->
-  <div class="card">
-    <div class="gate-row">
-      <div class="gate-info">
-        <div id="gateBadge" class="badge badge-closed">● Closed</div>
-        <h2>Site Access Gate</h2>
-        <p id="gateDesc">Site is private — no one can visit.</p>
-      </div>
-      <div class="toggle-wrap">
-        <span class="toggle-label" id="toggleLabel">OFF</span>
-        <label class="toggle">
-          <input type="checkbox" id="gateToggle" onchange="toggleGate()"/>
-          <span class="slider"></span>
-        </label>
+  <nav class="sidebar">
+    <div class="sb-logo"><span>🌹</span> loveurhum</div>
+    <a class="nav-item active" data-tab="gate"     onclick="goTab('gate',this)"><span class="nav-icon">🔒</span> Gate</a>
+    <a class="nav-item" data-tab="import"          onclick="goTab('import',this)"><span class="nav-icon">📥</span> Import Playlist</a>
+    <a class="nav-item" data-tab="videos"          onclick="goTab('videos',this)"><span class="nav-icon">🎬</span> Videos</a>
+    <a class="nav-item" data-tab="subjects"        onclick="goTab('subjects',this)"><span class="nav-icon">📚</span> Subjects</a>
+    <a class="nav-item" data-tab="members"         onclick="goTab('members',this)"><span class="nav-icon">👥</span> Members</a>
+    <div class="sb-bottom">
+      <div class="sb-user">Signed in as<br/><b id="sbUser"></b></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:.5rem">
+        <span class="api-pill"><span class="api-dot" id="apiDot"></span><span id="apiTxt">API…</span></span>
+        <button class="btn btn-ghost btn-sm" onclick="logout()">Sign out</button>
       </div>
     </div>
-  </div>
+  </nav>
 
-  <!-- Allowed Names -->
-  <div class="card">
-    <div class="sec-hdr">
-      <h2>Allowed Names <span class="count" id="nameCount">0</span></h2>
+  <main class="main">
+    <!-- mobile nav -->
+    <div class="mob-nav">
+      <a class="nav-item active" data-tab="gate"    onclick="goTab('gate',this)">🔒 Gate</a>
+      <a class="nav-item" data-tab="import"         onclick="goTab('import',this)">📥 Import</a>
+      <a class="nav-item" data-tab="videos"         onclick="goTab('videos',this)">🎬 Videos</a>
+      <a class="nav-item" data-tab="subjects"       onclick="goTab('subjects',this)">📚 Subjects</a>
+      <a class="nav-item" data-tab="members"        onclick="goTab('members',this)">👥 Members</a>
     </div>
-    <p style="font-size:.82rem;color:#5a5a72;margin-bottom:1rem">Only visitors with one of these names can enter when the gate is live.</p>
-    <div class="add-row">
-      <input type="text" id="newName" placeholder="e.g. Sarah Ahmed" onkeydown="if(event.key==='Enter')addName()"/>
-      <button class="add-btn" id="addBtn" onclick="addName()">+ Add Name</button>
-    </div>
-    <div class="name-list" id="nameList"><div class="empty">No names added yet.</div></div>
-  </div>
 
-  <!-- Members -->
-  <div class="card">
-    <div class="sec-hdr">
-      <h2>Access Log <span class="count" id="memberCount">0</span></h2>
-      <button class="refresh-btn" onclick="loadMembers()">↻ Refresh</button>
+    <!-- ── GATE ──────────────────────────────────────────────── -->
+    <div id="tab-gate">
+      <div class="page-hdr"><h1>🔒 Gate Control</h1><p>Toggle site access and manage who can enter.</p></div>
+
+      <div class="card">
+        <div class="gate-row">
+          <div>
+            <div id="gateBadge" class="badge badge-off">● Closed</div>
+            <div class="card-title">Site Access Gate</div>
+            <p id="gateDesc" class="card-desc" style="margin-bottom:0">Site is private — no visitors allowed.</p>
+          </div>
+          <div class="toggle-row">
+            <span class="toggle-lbl" id="toggleLbl">OFF</span>
+            <label class="toggle">
+              <input type="checkbox" id="gateToggle" onchange="toggleGate()"/>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hdr">
+          <div class="card-title">Allowed Names <span class="count" id="nameCount">0</span></div>
+        </div>
+        <p class="card-desc">Only visitors whose name matches one of these can enter when the gate is live.</p>
+        <div style="display:flex;gap:.6rem">
+          <input type="text" id="newNameInp" placeholder="e.g. Sarah Ahmed" style="flex:1" onkeydown="if(event.key==='Enter')addName()"/>
+          <button class="btn btn-primary" id="addNameBtn" onclick="addName()">+ Add</button>
+        </div>
+        <div class="msg msg-ok" id="nameOk"></div>
+        <div class="msg msg-err" id="nameErr"></div>
+        <div class="chips" id="nameList"><div style="color:#404060;font-size:.83rem;padding:.75rem 0">No names added yet.</div></div>
+      </div>
     </div>
-    <p style="font-size:.82rem;color:#5a5a72;margin-bottom:1rem">Everyone who entered using an approved name.</p>
-    <div class="member-list" id="memberList"><div class="empty">Loading…</div></div>
-  </div>
+
+    <!-- ── IMPORT ─────────────────────────────────────────────── -->
+    <div id="tab-import" style="display:none">
+      <div class="page-hdr"><h1>📥 Import Playlist</h1><p>Fetch a YouTube playlist and import videos to your site.</p></div>
+
+      <div class="card">
+        <div class="card-title">Fetch YouTube Playlist</div>
+        <p class="card-desc">Paste a YouTube playlist URL to load videos, then select which ones to import.</p>
+        <label class="lbl">Playlist URL</label>
+        <div style="display:flex;gap:.6rem">
+          <input type="url" id="plUrl" placeholder="https://www.youtube.com/playlist?list=..." style="flex:1"
+            onkeydown="if(event.key==='Enter')fetchPL()"/>
+          <button class="btn btn-primary" id="fetchBtn" onclick="fetchPL()">Fetch</button>
+        </div>
+        <div class="msg msg-err" id="fetchErr"></div>
+        <div class="msg msg-ok"  id="fetchOk"></div>
+      </div>
+
+      <div class="card" id="importCard" style="display:none">
+        <div class="card-hdr">
+          <div class="card-title">Select Videos <span class="count" id="plCount">0</span></div>
+          <div style="display:flex;gap:.4rem">
+            <button class="btn btn-ghost btn-sm" onclick="selAll()">All</button>
+            <button class="btn btn-ghost btn-sm" onclick="selNone()">None</button>
+          </div>
+        </div>
+        <div class="vid-list" id="plList"></div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:1.1rem">
+          <div>
+            <label class="lbl">Subject</label>
+            <select id="impSubj" onchange="onImpSubjChange()"><option value="">— select subject —</option></select>
+          </div>
+          <div>
+            <label class="lbl">Chapter (optional)</label>
+            <select id="impChap"><option value="">— none —</option></select>
+          </div>
+        </div>
+        <label class="lbl">Course label (optional)</label>
+        <input type="text" id="impCourse" placeholder="e.g. Math 101"/>
+
+        <div class="btn-row">
+          <button class="btn btn-primary" id="importBtn" onclick="doImport()">↓ Import Selected</button>
+          <span id="impCount" style="font-size:.8rem;color:#505075"></span>
+        </div>
+        <div class="msg msg-err" id="importErr"></div>
+        <div class="msg msg-ok"  id="importOk"></div>
+      </div>
+    </div>
+
+    <!-- ── VIDEOS ─────────────────────────────────────────────── -->
+    <div id="tab-videos" style="display:none">
+      <div class="page-hdr">
+        <h1>🎬 Videos <span class="count" id="vidCount">0</span></h1>
+        <p>All imported videos. Filter, search, or delete individual videos.</p>
+      </div>
+
+      <div class="filter-bar">
+        <input type="text" id="vidSearch" placeholder="Search title…" oninput="renderVideos()"/>
+        <select id="vidSubjFilter" onchange="renderVideos()">
+          <option value="">All subjects</option>
+        </select>
+        <button class="btn btn-ghost btn-sm" onclick="loadVideos()">↻ Refresh</button>
+      </div>
+
+      <div class="videos-grid" id="vidList"><div style="color:#404060;font-size:.83rem">Loading…</div></div>
+    </div>
+
+    <!-- ── SUBJECTS ──────────────────────────────────────────── -->
+    <div id="tab-subjects" style="display:none">
+      <div class="page-hdr">
+        <h1>📚 Subjects <span class="count" id="subjCount">0</span></h1>
+        <p>Manage subjects and chapters. Videos are assigned to subjects.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">New Subject</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
+          <div><label class="lbl">Name</label><input type="text" id="newSubjName" placeholder="e.g. Mathematics"/></div>
+          <div><label class="lbl">Course (optional)</label><input type="text" id="newSubjCourse" placeholder="e.g. HSC 2025"/></div>
+        </div>
+        <label class="lbl">Color</label>
+        <div style="display:flex;align-items:center;gap:.75rem">
+          <input type="color" id="newSubjColor" value="#7c3aed" style="width:44px;height:36px;padding:.2rem;border-radius:.4rem;cursor:pointer;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)"/>
+          <span style="font-size:.8rem;color:#505070">Subject accent colour</span>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="createSubjBtn" onclick="createSubject()">+ Create Subject</button>
+        </div>
+        <div class="msg msg-err" id="subjErr"></div>
+        <div class="msg msg-ok"  id="subjOk"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">All Subjects</div>
+        <div class="subj-list" id="subjList"><div style="color:#404060;font-size:.83rem">Loading…</div></div>
+      </div>
+    </div>
+
+    <!-- ── MEMBERS ──────────────────────────────────────────── -->
+    <div id="tab-members" style="display:none">
+      <div class="page-hdr">
+        <h1>👥 Members <span class="count" id="memCount">0</span></h1>
+        <p>Everyone who entered using an approved name.</p>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:1rem">
+        <button class="btn btn-ghost btn-sm" onclick="loadMembers()">↻ Refresh</button>
+      </div>
+      <div class="mem-list" id="memList"><div style="color:#404060;font-size:.83rem">Loading…</div></div>
+    </div>
+
+  </main>
 </div>
 
 <script>
-let adminUser = '';
-let adminPass = '';
+// ── Config ────────────────────────────────────────────────────
+const CA  = 'https://redrose-api.mulkesadmariadighi.workers.dev';
+const GA  = '/gate-api';
 
-// ── Login ─────────────────────────────────────────────────────────────────────
-document.getElementById('pw').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-document.getElementById('uname').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('pw').focus(); });
+let adminUser = '', adminPass = '', cToken = '';
+let allSubjects = [], allVideos = [], fetchedVids = [];
+
+// ── Login ─────────────────────────────────────────────────────
+document.getElementById('uname').addEventListener('keydown', e => e.key==='Enter' && document.getElementById('pw').focus());
+document.getElementById('pw').addEventListener('keydown',   e => e.key==='Enter' && doLogin());
 
 async function doLogin() {
   const u = document.getElementById('uname').value.trim();
   const p = document.getElementById('pw').value;
   const btn = document.getElementById('loginBtn');
   const err = document.getElementById('loginErr');
-  if (!u || !p) { err.textContent = 'Please fill in both fields.'; err.style.display = 'block'; return; }
+  if (!u || !p) { showMsg(err,'err','Please fill in both fields.'); return; }
+  btn.disabled=true; btn.innerHTML='<span class="spin"></span> Signing in…';
+  err.style.display='none';
 
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>Signing in…';
-  err.style.display = 'none';
+  const gResp = await fetch(GA+'/login', {
+    method:'POST', headers:jsHdr(), body:JSON.stringify({username:u, password:p})
+  }).then(r=>r.json()).catch(()=>({ok:false}));
 
-  const resp = await fetch('/gate-api/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username: u, password: p })
-  });
-  const data = await resp.json();
-
-  if (data.ok) {
-    adminUser = u; adminPass = p;
-    document.getElementById('login').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    loadAll();
-  } else {
-    err.textContent = data.error || 'Invalid credentials.';
-    err.style.display = 'block';
-    btn.disabled = false;
-    btn.textContent = 'Sign in';
+  if (!gResp.ok) {
+    showMsg(err,'err','Invalid username or password.');
+    btn.disabled=false; btn.textContent='Sign in'; return;
   }
+  adminUser=u; adminPass=p;
+  document.getElementById('sbUser').textContent=u;
+
+  // Login to content API simultaneously
+  fetch(CA+'/api/admin/login', {
+    method:'POST', headers:jsHdr(), body:JSON.stringify({username:u, password:p})
+  }).then(r=>r.json()).then(d=>{
+    if (d.token) { cToken=d.token; setApiStatus(true); loadContent(); }
+    else setApiStatus(false);
+  }).catch(()=>setApiStatus(false));
+
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('app').style.display='block';
+  loadGateStatus(); loadAllowedNames();
 }
 
 function logout() {
-  adminUser = ''; adminPass = '';
-  document.getElementById('login').style.display = 'flex';
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('uname').value = '';
-  document.getElementById('pw').value = '';
+  adminUser=adminPass=cToken='';
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('app').style.display='none';
+  document.getElementById('uname').value='';
+  document.getElementById('pw').value='';
 }
 
-function adminHeaders(extra = {}) {
-  return { 'X-Admin-Username': adminUser, 'X-Admin-Password': adminPass, 'Content-Type': 'application/json', ...extra };
+// ── Helpers ───────────────────────────────────────────────────
+const jsHdr = (extra={}) => ({'Content-Type':'application/json',...extra});
+const gHdr  = ()=> jsHdr({'X-Admin-Username':adminUser,'X-Admin-Password':adminPass});
+const cHdr  = ()=> jsHdr({'Authorization':'Bearer '+cToken});
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function showMsg(el,type,msg){ el.className='msg msg-'+(type==='ok'?'ok':'err'); el.textContent=msg; el.style.display='block'; if(type==='ok') setTimeout(()=>el.style.display='none',3500); }
+function setApiStatus(ok){ document.getElementById('apiDot').className='api-dot'+(ok?' ok':' fail'); document.getElementById('apiTxt').textContent=ok?'API OK':'API fail'; }
+
+// ── Tab routing ───────────────────────────────────────────────
+function goTab(tab, el) {
+  document.querySelectorAll('[data-tab]').forEach(n=>n.classList.toggle('active', n.dataset.tab===tab));
+  document.querySelectorAll('[id^="tab-"]').forEach(n=>n.style.display='none');
+  document.getElementById('tab-'+tab).style.display='block';
+  if (tab==='members') loadMembers();
+  if (tab==='subjects') renderSubjects();
+  if (tab==='videos')  renderVideos();
+  if (tab==='import')  populateImportSelects();
 }
 
-function loadAll() { loadGateStatus(); loadAllowedNames(); loadMembers(); }
+// ── Load all content once ─────────────────────────────────────
+async function loadContent() {
+  const [subs, vids] = await Promise.all([
+    fetch(CA+'/api/admin/subjects', {headers:cHdr()}).then(r=>r.ok?r.json():[]).catch(()=>[]),
+    fetch(CA+'/api/admin/videos',   {headers:cHdr()}).then(r=>r.ok?r.json():[]).catch(()=>[]),
+  ]);
+  allSubjects = Array.isArray(subs)?subs:[];
+  allVideos   = Array.isArray(vids)?vids:[];
+  document.getElementById('vidCount').textContent  = allVideos.length;
+  document.getElementById('subjCount').textContent = allSubjects.length;
+  populateVidFilter();
+  renderVideos();
+  renderSubjects();
+}
+async function loadVideos() {
+  allVideos = await fetch(CA+'/api/admin/videos', {headers:cHdr()}).then(r=>r.ok?r.json():[]).catch(()=>[]);
+  document.getElementById('vidCount').textContent = allVideos.length;
+  renderVideos();
+}
+async function loadSubjects() {
+  allSubjects = await fetch(CA+'/api/admin/subjects', {headers:cHdr()}).then(r=>r.ok?r.json():[]).catch(()=>[]);
+  document.getElementById('subjCount').textContent = allSubjects.length;
+  populateVidFilter(); populateImportSelects(); renderSubjects();
+}
 
-// ── Gate status ───────────────────────────────────────────────────────────────
+// ── Gate ──────────────────────────────────────────────────────
 async function loadGateStatus() {
-  const { isOpen } = await fetch('/gate-api/status').then(r => r.json());
-  applyGateUI(isOpen);
+  const d = await fetch(GA+'/status').then(r=>r.json()).catch(()=>({isOpen:false}));
+  applyGateUI(d.isOpen);
 }
-function applyGateUI(isOpen) {
-  document.getElementById('gateToggle').checked = isOpen;
-  document.getElementById('toggleLabel').textContent = isOpen ? 'ON' : 'OFF';
-  const badge = document.getElementById('gateBadge');
-  badge.textContent = isOpen ? '● Live' : '● Closed';
-  badge.className = 'badge ' + (isOpen ? 'badge-open' : 'badge-closed');
-  document.getElementById('gateDesc').textContent = isOpen
-    ? 'Gate is live — visitors with an approved name can enter.'
-    : 'Site is private — no one can visit.';
+function applyGateUI(on) {
+  document.getElementById('gateToggle').checked=on;
+  document.getElementById('toggleLbl').textContent=on?'ON':'OFF';
+  const b=document.getElementById('gateBadge');
+  b.textContent=on?'● Live':'● Closed'; b.className='badge '+(on?'badge-on':'badge-off');
+  document.getElementById('gateDesc').textContent=on
+    ?'Gate is live — visitors with an approved name can enter.'
+    :'Site is private — no visitors allowed.';
 }
 async function toggleGate() {
-  const isOpen = document.getElementById('gateToggle').checked;
-  document.getElementById('gateToggle').disabled = true;
-  const { isOpen: confirmed } = await fetch('/gate-api/toggle', {
-    method: 'POST', headers: adminHeaders(),
-    body: JSON.stringify({ isOpen })
-  }).then(r => r.json());
-  applyGateUI(confirmed);
-  document.getElementById('gateToggle').disabled = false;
+  const on=document.getElementById('gateToggle').checked;
+  document.getElementById('gateToggle').disabled=true;
+  const d=await fetch(GA+'/toggle',{method:'POST',headers:gHdr(),body:JSON.stringify({isOpen:on})}).then(r=>r.json());
+  applyGateUI(d.isOpen); document.getElementById('gateToggle').disabled=false;
 }
 
-// ── Allowed names ─────────────────────────────────────────────────────────────
+// ── Allowed names ─────────────────────────────────────────────
 async function loadAllowedNames() {
-  const { names } = await fetch('/gate-api/allowed-names', { headers: adminHeaders() }).then(r => r.json());
-  document.getElementById('nameCount').textContent = names.length;
-  const list = document.getElementById('nameList');
-  if (!names.length) { list.innerHTML = '<div class="empty">No names added yet. Add names below so visitors can enter.</div>'; return; }
-  list.innerHTML = '';
-  names.forEach(n => list.appendChild(renderName(n)));
-}
-function renderName(n) {
-  const el = document.createElement('div');
-  el.className = 'name-chip';
-  el.id = 'name-' + n.id;
-  el.innerHTML = `<span class="name-text">${esc(n.name)}</span>
-    <button class="del-name-btn" onclick="deleteName(${n.id},this)">Remove</button>`;
-  return el;
+  const d=await fetch(GA+'/allowed-names',{headers:gHdr()}).then(r=>r.json());
+  const names=d.names||[];
+  document.getElementById('nameCount').textContent=names.length;
+  const list=document.getElementById('nameList');
+  if (!names.length){ list.innerHTML='<div style="color:#404060;font-size:.83rem;padding:.5rem 0">No names added yet.</div>'; return; }
+  list.innerHTML='';
+  names.forEach(n=>{
+    const el=document.createElement('div'); el.className='chip'; el.id='nc'+n.id;
+    el.innerHTML=`<span class="chip-name">${esc(n.name)}</span>
+      <button class="btn btn-danger btn-xs" onclick="deleteName(${n.id})">Remove</button>`;
+    list.appendChild(el);
+  });
 }
 async function addName() {
-  const inp = document.getElementById('newName');
-  const btn = document.getElementById('addBtn');
-  const name = inp.value.trim();
-  if (!name) { inp.focus(); return; }
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>';
-  const resp = await fetch('/gate-api/allowed-names', {
-    method: 'POST', headers: adminHeaders(),
-    body: JSON.stringify({ name })
-  });
-  const data = await resp.json();
-  if (!resp.ok) { alert(data.error || 'Failed to add name.'); }
-  else { inp.value = ''; loadAllowedNames(); }
-  btn.disabled = false;
-  btn.textContent = '+ Add Name';
+  const inp=document.getElementById('newNameInp');
+  const name=inp.value.trim(); if(!name){inp.focus();return;}
+  const btn=document.getElementById('addNameBtn');
+  btn.disabled=true; btn.innerHTML='<span class="spin"></span>';
+  const resp=await fetch(GA+'/allowed-names',{method:'POST',headers:gHdr(),body:JSON.stringify({name})});
+  const d=await resp.json();
+  if(!resp.ok) showMsg(document.getElementById('nameErr'),'err',d.error||'Failed.');
+  else { inp.value=''; showMsg(document.getElementById('nameOk'),'ok','✓ "'+name+'" added.'); loadAllowedNames(); }
+  btn.disabled=false; btn.textContent='+ Add';
 }
-async function deleteName(id, btn) {
-  if (!confirm('Remove this name from the access list?')) return;
-  btn.disabled = true;
-  await fetch('/gate-api/allowed-names/' + id, { method: 'DELETE', headers: adminHeaders() });
+async function deleteName(id) {
+  if(!confirm('Remove this name?'))return;
+  await fetch(GA+'/allowed-names/'+id,{method:'DELETE',headers:gHdr()});
   loadAllowedNames();
 }
 
-// ── Members ───────────────────────────────────────────────────────────────────
-async function loadMembers() {
-  const list = document.getElementById('memberList');
-  list.innerHTML = '<div class="empty">Loading…</div>';
-  const { members } = await fetch('/gate-api/members', { headers: adminHeaders() }).then(r => r.json());
-  document.getElementById('memberCount').textContent = members.filter(m => m.is_active).length;
-  if (!members.length) { list.innerHTML = '<div class="empty">No one has entered yet.</div>'; return; }
-  list.innerHTML = '';
-  members.forEach(m => list.appendChild(renderMember(m)));
+// ── Playlist import ──────────────────────────────────────────
+async function fetchPL() {
+  const url=document.getElementById('plUrl').value.trim();
+  const btn=document.getElementById('fetchBtn');
+  const errEl=document.getElementById('fetchErr'), okEl=document.getElementById('fetchOk');
+  errEl.style.display='none'; okEl.style.display='none';
+  if(!url){showMsg(errEl,'err','Enter a playlist URL.');return;}
+  if(!cToken){showMsg(errEl,'err','Content API not connected — check credentials.');return;}
+  btn.disabled=true; btn.innerHTML='<span class="spin"></span> Fetching…';
+  const resp=await fetch(CA+'/api/admin/playlist/fetch',{
+    method:'POST',headers:cHdr(),body:JSON.stringify({playlist:url})
+  }).then(r=>r.json()).catch(e=>({error:e.message}));
+  btn.disabled=false; btn.textContent='Fetch';
+  if(resp.error){showMsg(errEl,'err',resp.error);document.getElementById('importCard').style.display='none';return;}
+  fetchedVids=Array.isArray(resp)?resp:(resp.videos||[]);
+  if(!fetchedVids.length){showMsg(errEl,'err','No videos found.');document.getElementById('importCard').style.display='none';return;}
+  renderPlVideos(); document.getElementById('importCard').style.display='block';
+  showMsg(okEl,'ok','✓ Found '+fetchedVids.length+' videos — select which to import.');
 }
-function renderMember(m) {
-  const card = document.createElement('div');
-  card.className = 'member-card';
-  const ua = m.user_agent || '';
-  const browser = ua.includes('Chrome') ? 'Chrome' : ua.includes('Firefox') ? 'Firefox' : ua.includes('Safari') ? 'Safari' : ua.includes('Edge') ? 'Edge' : '?';
-  const os = ua.includes('iPhone') ? 'iOS' : ua.includes('Android') ? 'Android' : ua.includes('Win') ? 'Windows' : ua.includes('Mac') ? 'macOS' : ua.includes('Linux') ? 'Linux' : '?';
-  const dt = new Date(m.granted_at.includes('Z') ? m.granted_at : m.granted_at + 'Z');
-  const fp = m.fingerprint ? m.fingerprint.slice(0, 14) + '…' : 'N/A';
-  card.innerHTML = `
-    <div>
-      <div class="member-name">${esc(m.name)}${!m.is_active ? '<span class="revoked">Revoked</span>' : ''}</div>
-      <div class="member-meta">
-        <span class="meta-chip">🌐 <b>IP</b> ${esc(m.ip || 'N/A')}</span>
-        <span class="meta-chip">🖥️ <b>OS</b> ${os}</span>
-        <span class="meta-chip">🌍 <b>Browser</b> ${browser}</span>
-        <span class="meta-chip">📱 <b>Device</b> ${esc(m.device_info || 'N/A')}</span>
-        <span class="meta-chip">🔑 <b>Print</b> ${fp}</span>
-        <span class="meta-chip">🕐 <b>Joined</b> ${dt.toLocaleString()}</span>
-      </div>
-    </div>
-    ${m.is_active ? `<button class="del-btn" onclick="revokeMember(${m.id},this)">Revoke</button>` : ''}`;
-  return card;
+function renderPlVideos() {
+  document.getElementById('plCount').textContent=fetchedVids.length;
+  const list=document.getElementById('plList'); list.innerHTML='';
+  fetchedVids.forEach((v,i)=>{
+    const el=document.createElement('div'); el.className='vid-item selected'; el.dataset.idx=i;
+    el.onclick=function(){ el.classList.toggle('selected'); el.querySelector('input').checked=el.classList.contains('selected'); updateImpCount(); };
+    el.innerHTML=`<input class="vid-check" type="checkbox" checked onclick="event.stopPropagation();this.closest('.vid-item').classList.toggle('selected',this.checked);updateImpCount()"/>
+      <img class="vid-thumb" src="https://i.ytimg.com/vi/${esc(v.videoId||v.id)}/mqdefault.jpg" onerror="this.style.visibility='hidden'" loading="lazy" alt=""/>
+      <div><div class="vid-title">${esc(v.title)}</div>${v.date?`<div class="vid-meta">${esc(v.date)}</div>`:''}</div>`;
+    list.appendChild(el);
+  });
+  updateImpCount();
 }
-async function revokeMember(id, btn) {
-  if (!confirm('Revoke this member\'s access?')) return;
-  btn.disabled = true; btn.textContent = '…';
-  await fetch('/gate-api/members/' + id, { method: 'DELETE', headers: adminHeaders() });
-  loadMembers();
+function selAll()  { document.querySelectorAll('#plList .vid-item').forEach(e=>{e.classList.add('selected');e.querySelector('input').checked=true;}); updateImpCount(); }
+function selNone() { document.querySelectorAll('#plList .vid-item').forEach(e=>{e.classList.remove('selected');e.querySelector('input').checked=false;}); updateImpCount(); }
+function updateImpCount(){ document.getElementById('impCount').textContent=document.querySelectorAll('#plList .vid-item.selected').length+' selected'; }
+
+function populateImportSelects() {
+  const sel=document.getElementById('impSubj');
+  sel.innerHTML='<option value="">— select subject —</option>';
+  allSubjects.forEach(s=>sel.insertAdjacentHTML('beforeend',`<option value="${esc(s.id)}">${esc(s.name)}</option>`));
+}
+function onImpSubjChange() {
+  const id=document.getElementById('impSubj').value;
+  const s=allSubjects.find(x=>x.id===id);
+  const csel=document.getElementById('impChap');
+  csel.innerHTML='<option value="">— none —</option>';
+  (s?.chapters||[]).forEach(c=>csel.insertAdjacentHTML('beforeend',`<option value="${esc(c.id)}">${esc(c.name)}</option>`));
+}
+async function doImport() {
+  const sel=[...document.querySelectorAll('#plList .vid-item.selected')].map(el=>fetchedVids[+el.dataset.idx]).filter(Boolean);
+  const subjId=document.getElementById('impSubj').value;
+  const chapId=document.getElementById('impChap').value;
+  const course=document.getElementById('impCourse').value.trim();
+  const btn=document.getElementById('importBtn');
+  const errEl=document.getElementById('importErr'), okEl=document.getElementById('importOk');
+  errEl.style.display='none'; okEl.style.display='none';
+  if(!sel.length){showMsg(errEl,'err','No videos selected.');return;}
+  if(!cToken){showMsg(errEl,'err','Content API not connected.');return;}
+  btn.disabled=true; btn.innerHTML='<span class="spin"></span> Importing…';
+  const resp=await fetch(CA+'/api/admin/videos/bulk',{
+    method:'POST',headers:cHdr(),
+    body:JSON.stringify({videos:sel,subjectId:subjId||undefined,chapterId:chapId||undefined,course:course||undefined,online:true})
+  }).then(r=>r.json()).catch(e=>({error:e.message}));
+  btn.disabled=false; btn.textContent='↓ Import Selected';
+  if(resp.error){showMsg(errEl,'err',resp.error);return;}
+  showMsg(okEl,'ok',`✓ Imported ${resp.added??sel.length} video(s)${resp.skipped?` (${resp.skipped} already existed)`:''}.`);
+  selNone(); loadVideos(); loadSubjects();
 }
 
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+// ── Videos management ─────────────────────────────────────────
+function populateVidFilter() {
+  const sel=document.getElementById('vidSubjFilter');
+  const cur=sel.value;
+  sel.innerHTML='<option value="">All subjects</option>';
+  allSubjects.forEach(s=>sel.insertAdjacentHTML('beforeend',`<option value="${esc(s.id)}"${s.id===cur?' selected':''}>${esc(s.name)}</option>`));
+}
+function renderVideos() {
+  const search=(document.getElementById('vidSearch')?.value||'').toLowerCase();
+  const subjId=document.getElementById('vidSubjFilter')?.value||'';
+  let vids=allVideos;
+  if(subjId) vids=vids.filter(v=>v.subjectId===subjId);
+  if(search) vids=vids.filter(v=>(v.title||'').toLowerCase().includes(search));
+  document.getElementById('vidCount').textContent=allVideos.length;
+  const list=document.getElementById('vidList');
+  if(!cToken){list.innerHTML='<div style="color:#404060;font-size:.83rem">Content API not connected.</div>';return;}
+  if(!vids.length){list.innerHTML='<div style="color:#404060;font-size:.83rem;padding:.75rem 0">No videos found.</div>';return;}
+  list.innerHTML='';
+  vids.forEach((v,i)=>{
+    const subj=allSubjects.find(s=>s.id===v.subjectId);
+    const el=document.createElement('div'); el.className='vmgr-item'; el.id='vid-'+v.id;
+    el.innerHTML=`<span class="vmgr-num">${i+1}</span>
+      <img class="vmgr-thumb" src="https://i.ytimg.com/vi/${esc(v.videoId)}/mqdefault.jpg" onerror="this.style.visibility='hidden'" loading="lazy" alt=""/>
+      <div>
+        <div class="vmgr-title">${esc(v.title)}</div>
+        <div class="vmgr-sub">${subj?esc(subj.name):'No subject'}${v.date?' · '+esc(v.date):''}</div>
+      </div>
+      <button class="btn btn-danger btn-xs" onclick="deleteVideo('${esc(v.id)}','${esc(v.title.replace(/'/g,"\\'"))}')">Delete</button>`;
+    list.appendChild(el);
+  });
+}
+async function deleteVideo(id, title) {
+  if(!confirm(`Delete "${title}"?`))return;
+  const el=document.getElementById('vid-'+id);
+  if(el) { el.style.opacity='.4'; el.querySelectorAll('button').forEach(b=>b.disabled=true); }
+  await fetch(CA+'/api/admin/videos/'+id,{method:'DELETE',headers:cHdr()});
+  allVideos=allVideos.filter(v=>v.id!==id);
+  document.getElementById('vidCount').textContent=allVideos.length;
+  renderVideos();
+}
+
+// ── Subjects ──────────────────────────────────────────────────
+function renderSubjects() {
+  const list=document.getElementById('subjList');
+  document.getElementById('subjCount').textContent=allSubjects.length;
+  if(!cToken){list.innerHTML='<div style="color:#404060;font-size:.83rem">Content API not connected.</div>';return;}
+  if(!allSubjects.length){list.innerHTML='<div style="color:#404060;font-size:.83rem;padding:.5rem 0">No subjects yet.</div>';return;}
+  list.innerHTML='';
+  allSubjects.forEach(s=>{
+    const ch=s.chapters||[];
+    const el=document.createElement('div'); el.className='subj-card';
+    el.innerHTML=`<div class="subj-head">
+      <div class="subj-name">
+        <span class="subj-dot" style="background:${esc(s.color||'#7c3aed')}"></span>
+        ${esc(s.name)}${s.course?`<span class="subj-course">· ${esc(s.course)}</span>`:''}
+      </div>
+      <div style="display:flex;gap:.4rem;align-items:center;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-xs" onclick="addChapter('${esc(s.id)}','${esc(s.name.replace(/'/g,"\\'"))}')">+ Chapter</button>
+        <button class="btn btn-danger btn-xs" onclick="deleteSubject('${esc(s.id)}','${esc(s.name.replace(/'/g,"\\'"))}')">Delete</button>
+      </div>
+    </div>
+    ${ch.length?`<div class="ch-row">${ch.map(c=>`<span class="ch-chip">${esc(c.name)}<button class="ch-del" onclick="deleteChapter('${esc(s.id)}','${esc(c.id)}','${esc(c.name.replace(/'/g,"\\'"))}')">×</button></span>`).join('')}</div>`:'<div style="font-size:.75rem;color:#404060;margin-top:.25rem">No chapters yet.</div>'}`;
+    list.appendChild(el);
+  });
+}
+async function createSubject() {
+  const name=document.getElementById('newSubjName').value.trim();
+  const course=document.getElementById('newSubjCourse').value.trim();
+  const color=document.getElementById('newSubjColor').value;
+  const btn=document.getElementById('createSubjBtn');
+  const errEl=document.getElementById('subjErr'), okEl=document.getElementById('subjOk');
+  errEl.style.display='none'; okEl.style.display='none';
+  if(!name){showMsg(errEl,'err','Name is required.');return;}
+  if(!cToken){showMsg(errEl,'err','Content API not connected.');return;}
+  btn.disabled=true; btn.innerHTML='<span class="spin"></span>';
+  const resp=await fetch(CA+'/api/admin/subjects',{
+    method:'POST',headers:cHdr(),body:JSON.stringify({name,course:course||undefined,color})
+  }).then(r=>r.json()).catch(e=>({error:e.message}));
+  btn.disabled=false; btn.textContent='+ Create Subject';
+  if(resp.error){showMsg(errEl,'err',resp.error);return;}
+  document.getElementById('newSubjName').value='';
+  document.getElementById('newSubjCourse').value='';
+  showMsg(okEl,'ok','✓ Subject "'+name+'" created.'); loadSubjects();
+}
+async function deleteSubject(id,name) {
+  if(!confirm(`Delete subject "${name}"? Videos in this subject will lose their assignment.`))return;
+  await fetch(CA+'/api/admin/subjects/'+id,{method:'DELETE',headers:cHdr()});
+  loadSubjects(); loadVideos();
+}
+async function addChapter(subjId,subjName) {
+  const name=prompt(`New chapter name for "${subjName}":`);
+  if(!name?.trim())return;
+  await fetch(CA+'/api/admin/subjects/'+subjId+'/chapters',{
+    method:'POST',headers:cHdr(),body:JSON.stringify({name:name.trim()})
+  });
+  loadSubjects();
+}
+async function deleteChapter(subjId,chapId,name) {
+  if(!confirm(`Delete chapter "${name}"?`))return;
+  await fetch(CA+'/api/admin/subjects/'+subjId+'/chapters/'+chapId,{method:'DELETE',headers:cHdr()});
+  loadSubjects();
+}
+
+// ── Members ───────────────────────────────────────────────────
+async function loadMembers() {
+  const list=document.getElementById('memList');
+  list.innerHTML='<div style="color:#404060;font-size:.83rem">Loading…</div>';
+  const d=await fetch(GA+'/members',{headers:gHdr()}).then(r=>r.json()).catch(()=>({members:[]}));
+  const members=d.members||[];
+  document.getElementById('memCount').textContent=members.filter(m=>m.is_active).length;
+  if(!members.length){list.innerHTML='<div style="color:#404060;font-size:.83rem;padding:.5rem 0">No one has entered yet.</div>';return;}
+  list.innerHTML='';
+  members.forEach(m=>{
+    const ua=m.user_agent||'';
+    const browser=ua.includes('Edg')?'Edge':ua.includes('Chrome')?'Chrome':ua.includes('Firefox')?'Firefox':ua.includes('Safari')?'Safari':'?';
+    const os=ua.includes('iPhone')?'iOS':ua.includes('Android')?'Android':ua.includes('Win')?'Windows':ua.includes('Mac')?'macOS':ua.includes('Linux')?'Linux':'?';
+    const dt=new Date((m.granted_at||'').endsWith('Z')?m.granted_at:m.granted_at+'Z');
+    const fp=m.fingerprint?m.fingerprint.slice(0,14)+'…':'N/A';
+    const card=document.createElement('div'); card.className='mem-card';
+    card.innerHTML=`<div>
+      <div class="mem-name">${esc(m.name)}${!m.is_active?'<span class="rev-badge">Revoked</span>':''}</div>
+      <div class="meta-row">
+        <span class="meta">🌐 <b>IP</b> ${esc(m.ip||'N/A')}</span>
+        <span class="meta">🖥 <b>OS</b> ${os}</span>
+        <span class="meta">🌍 <b>Browser</b> ${browser}</span>
+        <span class="meta">📱 <b>Device</b> ${esc(m.device_info||'N/A')}</span>
+        <span class="meta">🔑 <b>Print</b> ${fp}</span>
+        <span class="meta">🕐 <b>Joined</b> ${dt.toLocaleString()}</span>
+      </div>
+    </div>
+    ${m.is_active?`<button class="btn btn-danger btn-sm" onclick="revokeMember(${m.id},this)">Revoke</button>`:''}`;
+    list.appendChild(card);
+  });
+}
+async function revokeMember(id,btn) {
+  if(!confirm("Revoke this member's access?"))return;
+  btn.disabled=true; btn.textContent='…';
+  await fetch(GA+'/members/'+id,{method:'DELETE',headers:gHdr()});
+  loadMembers();
+}
 </script>
 </body>
 </html>
